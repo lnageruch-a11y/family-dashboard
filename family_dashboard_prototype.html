@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>家族の情報ボード</title>
+<style>
+:root{
+  --navy:#10233d; --blue:#1769c2; --blue2:#e9f3ff; --ink:#15385e;
+  --muted:#627891; --line:#dce6ef; --green:#16845b; --mint:#e8f8f2;
+  --red:#d64c52; --rose:#fff0f0; --card:#fff; --gold:#f3bd4b;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:var(--ink);
+ background:linear-gradient(150deg,#172e50 0%,#324f70 36%,#f2a47e 67%,#203955 100%);padding:clamp(8px,1vw,18px)}
+.page{width:100%;max-width:1900px;margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;color:white;padding:.15rem .6rem clamp(8px,1vw,16px);gap:1rem}
+.brand{display:flex;align-items:center;gap:.8rem;font-weight:800;font-size:clamp(1.35rem,2.5vw,2.7rem);letter-spacing:.03em}
+.brand .house{font-size:1.35em}
+.tagline{font-size:.52em;font-weight:500;opacity:.85;border-left:1px solid #ffffff70;padding-left:.8rem}
+.clock{text-align:right;white-space:nowrap;font-size:clamp(.9rem,1.5vw,1.4rem)}
+.clock strong{font-size:1.5em;margin-left:.45rem}
+.top{display:grid;grid-template-columns:1.35fr .95fr;gap:clamp(8px,1vw,16px);margin-bottom:clamp(8px,1vw,16px)}
+.card{border-radius:clamp(10px,1.1vw,18px);background:var(--card);box-shadow:0 8px 24px #071a3030;overflow:hidden;min-width:0}
+.weather{background:linear-gradient(135deg,#1769c2,#54a8e8);color:white;padding:clamp(12px,1.4vw,24px);display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(8px,1vw,16px);align-items:center}
+.location{font-size:clamp(1rem,1.5vw,1.5rem);font-weight:750}
+.current{display:flex;align-items:center;gap:1rem;margin:.6rem 0}
+.weather-icon{font-size:clamp(3rem,5vw,5.5rem);line-height:1}
+.temp{font-size:clamp(2.7rem,5vw,5rem);font-weight:800;line-height:1}
+.temp small{font-size:.38em}
+.weather-desc{font-size:clamp(1rem,1.6vw,1.5rem);font-weight:700}
+.hilo{margin-top:.6rem;opacity:.92;font-size:clamp(.85rem,1.15vw,1.1rem)}
+.forecast{display:grid;grid-template-columns:1fr 1fr;border-left:1px solid #ffffff65}
+.forecast-day{text-align:center;padding:.4rem .6rem}
+.forecast-day+ .forecast-day{border-left:1px solid #ffffff65}
+.forecast-label{font-weight:750;font-size:clamp(.9rem,1.25vw,1.2rem)}
+.forecast-icon{font-size:clamp(2rem,3.5vw,3.6rem);margin:.5rem 0}
+.forecast-temp{font-size:clamp(.95rem,1.3vw,1.3rem);font-weight:750}
+.small-note{font-size:.78rem;opacity:.8;margin-top:.55rem}
+.card-title{display:flex;align-items:center;gap:.65rem;font-size:clamp(1rem,1.45vw,1.5rem);font-weight:800;padding:clamp(9px,1vw,16px) clamp(10px,1.1vw,18px);border-bottom:1px solid var(--line)}
+.card-title .ico{width:2.25rem;height:2.25rem;border-radius:10px;display:grid;place-items:center;background:var(--blue);color:white;font-size:1.25rem;flex-shrink:0}
+.card-title .right{margin-left:auto;font-size:.72em;font-weight:700;color:var(--blue);white-space:nowrap}
+.garbage-body{padding:1rem 1.15rem}
+.area{font-size:.85rem;color:var(--muted);margin-bottom:.7rem}
+.garbage-grid{display:grid;grid-template-columns:1fr 1fr;background:#f5f8fb;border-radius:14px;padding:.75rem}
+.gday{text-align:center;padding:.25rem .5rem}
+.gday+.gday{border-left:1px solid var(--line)}
+.gday-label{font-weight:800;color:var(--green);font-size:clamp(.9rem,1.2vw,1.15rem)}
+.gdate{color:#4e6074;margin:.35rem 0 .7rem}
+.pill{border-radius:999px;background:#e8edf3;padding:.55rem .45rem;font-weight:800;color:#526174;font-size:clamp(.8rem,1.1vw,1.05rem)}
+.pill.fire{background:var(--rose);color:var(--red)}
+.notice{color:var(--muted);font-size:.78rem;line-height:1.5;margin-top:.7rem}
+.main{display:grid;grid-template-columns:1fr 1fr .92fr;gap:clamp(8px,1vw,16px)}
+.train-body{padding:1rem 1.15rem}
+.route{font-weight:800;font-size:clamp(1rem,1.35vw,1.3rem);margin:.2rem 0 .7rem}
+.status{display:inline-block;background:#e7f7ee;color:var(--green);padding:.45rem .8rem;border-radius:9px;font-size:.9rem;font-weight:800;float:right}
+.linkrow{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:1rem 0;font-weight:700;gap:.5rem}
+.linkrow a{color:var(--blue);text-decoration:none}
+.statusbox{background:#f2f6fa;padding:.8rem;border-radius:10px;color:#4e647c;margin-top:.5rem}
+.agenda{padding:1rem 1.15rem}
+.agenda-date{font-weight:800;font-size:1.1rem;margin:.2rem 0 .7rem}
+.event{display:grid;grid-template-columns:12px 3.7rem 1fr;align-items:start;gap:.6rem;padding:.55rem 0;font-size:clamp(.85rem,1.1vw,1.05rem)}
+.dot{width:12px;height:12px;border-radius:50%;margin-top:.35rem;background:#ed6c9a}
+.event:nth-of-type(2) .dot{background:#46a9ed}
+.event:nth-of-type(3) .dot{background:#25a394}
+.agenda-divider{border-top:1px solid var(--line);margin:.8rem 0}
+.side{display:flex;flex-direction:column;gap:clamp(8px,1vw,16px);min-width:0}
+.list-card{background:linear-gradient(135deg,#f7fffc,#e3f7f1)}
+.list-card.shopping{background:linear-gradient(135deg,#f7fffc,#d9f5eb)}
+.list-body{padding:.15rem 1rem .8rem}
+.list-item{display:flex;align-items:center;gap:.65rem;padding:.35rem 0;font-size:clamp(.88rem,1.08vw,1.03rem);cursor:pointer}
+.list-item input{width:1.25rem;height:1.25rem;accent-color:var(--green);flex-shrink:0}
+.list-item.done span{text-decoration:line-through;color:#82958f}
+.addrow{display:flex;gap:.4rem;margin-top:.5rem}
+.addrow input{min-width:0;width:100%;border:1px solid #c9ddd7;border-radius:8px;padding:.55rem;font:inherit;background:#fff}
+.addrow button{border:0;border-radius:8px;padding:.5rem .8rem;background:var(--green);color:white;font-weight:800}
+footer{margin-top:clamp(8px,1vw,16px);background:#0c1d33e8;color:#dce9f8;border-radius:14px;padding:clamp(7px,.8vw,13px) 1rem;display:flex;align-items:center;gap:.7rem;font-size:clamp(.8rem,1.05vw,1.1rem)}
+footer .remote{font-size:1.6rem}
+footer .hint{margin-left:auto;border:1px solid #b4c9df;border-radius:999px;padding:.3rem .8rem;white-space:nowrap}
+
+/* TV landscape mode: keep the complete dashboard within a 16:9 screen. */
+@media (min-width:1100px) and (min-height:650px){
+  body{height:100vh;overflow:hidden}
+  .page{height:100%;display:flex;flex-direction:column}
+  header{flex:0 0 auto}
+  .top{grid-template-columns:1.35fr .95fr;flex:0 0 31%;min-height:0}
+  .main{flex:1 1 auto;min-height:0}
+  .top>.card,.main>.card,.side>.card{min-height:0}
+  .weather{padding:clamp(12px,1.25vw,22px)}
+  .garbage-body,.train-body,.agenda{padding:clamp(9px,1vw,16px)}
+  .card-title{padding:clamp(8px,.8vw,14px) clamp(10px,1vw,17px)}
+  .side .list-card{flex:1 1 0}
+  .list-body{padding:0 clamp(9px,.9vw,15px) clamp(4px,.5vw,8px)}
+  .list-item{padding:clamp(2px,.28vw,5px) 0;font-size:clamp(13px,1.02vw,19px)}
+  .addrow{display:none!important}
+  .agenda .event{padding:clamp(3px,.35vw,6px) 0}
+  .notice{font-size:clamp(11px,.78vw,14px)}
+  footer{flex:0 0 auto}
+}
+
+@media(max-width:900px){
+ body{padding:.65rem}.top{grid-template-columns:1fr}.main{grid-template-columns:1fr 1fr}.side{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+ header{align-items:flex-start;flex-direction:column}.clock{text-align:left}.weather{grid-template-columns:1fr}.forecast{border-left:0;border-top:1px solid #ffffff65;padding-top:.6rem}
+ .main,.side{grid-template-columns:1fr}.side{grid-column:auto}.tagline{display:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="brand"><span class="house">⌂</span><span>家族の情報ボード</span><span class="tagline">今日もいい一日を 🌿</span></div>
+  <div class="clock"><span id="date">日付を読み込み中</span><strong id="time">--:--</strong></div>
+</header>
+<section class="top">
+  <article class="card weather">
+    <div>
+      <div class="location">☀️ 東広島市 <span style="font-size:.8em">📍</span></div>
+      <div class="current"><span class="weather-icon" id="weatherIcon">🌤️</span><div><div class="temp"><span id="currentTemp">--</span><small>°C</small></div><div class="weather-desc" id="weatherDesc">天気データ接続前</div></div></div>
+      <div class="hilo">最高 <b id="todayMax">--</b>°C　 最低 <b id="todayMin">--</b>°C</div>
+    </div>
+    <div class="forecast">
+      <div class="forecast-day"><div class="forecast-label">今日 <span id="todayLabel"></span></div><div class="forecast-icon" id="todayIcon">🌤️</div><div class="forecast-temp"><span id="todayHi">--</span>° / <span id="todayLo">--</span>°C</div><div class="small-note">降水確率 <span id="todayRain">--</span>%</div></div>
+      <div class="forecast-day"><div class="forecast-label">明日 <span id="tomorrowLabel"></span></div><div class="forecast-icon" id="tomorrowIcon">☀️</div><div class="forecast-temp"><span id="tomorrowHi">--</span>° / <span id="tomorrowLo">--</span>°C</div><div class="small-note">降水確率 <span id="tomorrowRain">--</span>%</div></div>
+    </div>
+    <div class="small-note" id="weatherNote" style="grid-column:1/-1">天気は次の段階で無料データと接続します</div>
+  </article>
+  <article class="card">
+    <div class="card-title"><span class="ico" style="background:#f4f7fa;color:#1a5265">▤</span>ごみの日 <span class="right">📍 東広島市 八本松南</span></div>
+    <div class="garbage-body">
+      <div class="area">収集区分は住所に合う日程を登録してください</div>
+      <div class="garbage-grid">
+        <div class="gday"><div class="gday-label">今日</div><div class="gdate" id="garbageTodayDate">--/--</div><div class="pill" id="garbageToday">未設定</div></div>
+        <div class="gday"><div class="gday-label">明日</div><div class="gdate" id="garbageTomorrowDate">--/--</div><div class="pill fire" id="garbageTomorrow">未設定</div></div>
+      </div>
+      <div class="notice">※ごみの日は地域・丁目で異なります。正しい収集日程を確認後に設定します。</div>
+    </div>
+  </article>
+</section>
+<section class="main">
+  <article class="card">
+    <div class="card-title"><span class="ico">▣</span>電車の運行状況 <span class="right"><a href="https://trafficinfo.westjr.co.jp/chugoku.html" target="_blank" rel="noreferrer">JR西日本 ↗</a></span></div>
+    <div class="train-body">
+      <div class="route">山陽本線（広島〜岡山方面）</div>
+      <div class="status">公式情報を確認</div>
+      <div style="clear:both"></div>
+      <div class="linkrow"><span>JR西日本 中国エリア運行情報</span><a href="https://trafficinfo.westjr.co.jp/chugoku.html" target="_blank" rel="noreferrer">開く ›</a></div>
+      <div style="font-weight:750;margin-top:.6rem">遅延・運休情報</div>
+      <div class="statusbox">この試作版では運行状態を自動判定しません。最新情報は公式ページで確認してください。</div>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-title"><span class="ico">▦</span>今日・明日の予定 <span class="right"><a href="https://timetreeapp.com/" target="_blank" rel="noreferrer">TimeTreeで見る ↗</a></span></div>
+    <div class="agenda">
+      <div class="agenda-date" id="agendaToday">今日</div>
+      <div class="event"><span class="dot"></span><span>予定</span><span>TimeTreeを開いて確認</span></div>
+      <div class="agenda-divider"></div>
+      <div class="agenda-date" id="agendaTomorrow">明日</div>
+      <div class="event"><span class="dot"></span><span>予定</span><span>TimeTreeを開いて確認</span></div>
+      <div class="notice">TimeTreeの予定は自動連携していません。右上のリンクから開けます。</div>
+    </div>
+  </article>
+  <div class="side">
+    <article class="card list-card">
+      <div class="card-title" style="border:0;padding-bottom:.45rem"><span class="ico" style="background:#147d70">✓</span>やることリスト</div>
+      <div class="list-body" id="tasks">
+        <label class="list-item"><input type="checkbox"><span>保育園の準備（連絡帳・持ち物）</span></label>
+        <label class="list-item"><input type="checkbox"><span>書類を提出する</span></label>
+        <label class="list-item"><input type="checkbox"><span>ガソリンを入れる</span></label>
+      </div>
+      <div class="addrow" style="padding:0 1rem 1rem"><input id="taskInput" placeholder="やることを追加"><button id="addTask">追加</button></div>
+    </article>
+    <article class="card list-card shopping">
+      <div class="card-title" style="border:0;padding-bottom:.45rem"><span class="ico" style="background:#147d70">🛒</span>買い物リスト</div>
+      <div class="list-body" id="shopping">
+        <label class="list-item"><input type="checkbox"><span>牛乳</span></label>
+        <label class="list-item"><input type="checkbox"><span>たまご</span></label>
+        <label class="list-item"><input type="checkbox"><span>食パン</span></label>
+        <label class="list-item"><input type="checkbox"><span>洗剤</span></label>
+        <label class="list-item"><input type="checkbox"><span>野菜（にんじん・玉ねぎ）</span></label>
+      </div>
+      <div class="addrow" style="padding:0 1rem 1rem"><input id="shoppingInput" placeholder="買うものを追加"><button id="addShopping">追加</button></div>
+    </article>
+  </div>
+</section>
+<footer><span class="remote">▯</span><span>家族みんなで使う情報ボード</span><span class="hint">DAZNボタンの変更は後で確認</span></footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function updateClock(){
+ const now=new Date();
+ $('date').textContent=new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(now);
+ $('time').textContent=new Intl.DateTimeFormat('ja-JP',{hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
+ const tomorrow=new Date(now);tomorrow.setDate(now.getDate()+1);
+ const fmt=d=>`${d.getMonth()+1}/${d.getDate()} (${['日','月','火','水','木','金','土'][d.getDay()]})`;
+ $('todayLabel').textContent=`(${fmt(now)})`; $('tomorrowLabel').textContent=`(${fmt(tomorrow)})`;
+ $('garbageTodayDate').textContent=fmt(now);$('garbageTomorrowDate').textContent=fmt(tomorrow);
+ $('agendaToday').textContent=fmt(now);$('agendaTomorrow').textContent=fmt(tomorrow);
+}
+updateClock();setInterval(updateClock,30000);
+function addItem(inputId,listId){
+ const input=$(inputId),text=input.value.trim();if(!text)return;
+ const label=document.createElement('label');label.className='list-item';
+ const cb=document.createElement('input');cb.type='checkbox';
+ const span=document.createElement('span');span.textContent=text;
+ cb.addEventListener('change',()=>label.classList.toggle('done',cb.checked));
+ label.append(cb,span);$(listId).append(label);input.value='';
+}
+$('addTask').addEventListener('click',()=>addItem('taskInput','tasks'));
+$('addShopping').addEventListener('click',()=>addItem('shoppingInput','shopping'));
+$('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter')addItem('taskInput','tasks')});
+$('shoppingInput').addEventListener('keydown',e=>{if(e.key==='Enter')addItem('shoppingInput','shopping')});
+document.querySelectorAll('.list-item input').forEach(cb=>cb.addEventListener('change',()=>cb.parentElement.classList.toggle('done',cb.checked)));
+</script>
+</body>
+</html>
