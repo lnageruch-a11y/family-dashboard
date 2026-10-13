@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>家族の情報ボード</title>
+<style>
+:root{
+  --navy:#10233d; --blue:#1769c2; --blue2:#e9f3ff; --ink:#15385e;
+  --muted:#627891; --line:#dce6ef; --green:#16845b; --mint:#e8f8f2;
+  --red:#d64c52; --rose:#fff0f0; --card:#fff; --gold:#f3bd4b;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:var(--ink);
+ background:linear-gradient(150deg,#172e50 0%,#324f70 36%,#f2a47e 67%,#203955 100%);padding:clamp(8px,1vw,18px)}
+.page{width:100%;max-width:1900px;margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;color:white;padding:.15rem .6rem clamp(8px,1vw,16px);gap:1rem}
+.brand{display:flex;align-items:center;gap:.8rem;font-weight:800;font-size:clamp(1.35rem,2.5vw,2.7rem);letter-spacing:.03em}
+.brand .house{font-size:1.35em}
+.tagline{font-size:.52em;font-weight:500;opacity:.85;border-left:1px solid #ffffff70;padding-left:.8rem}
+.clock{text-align:right;white-space:nowrap;font-size:clamp(.9rem,1.5vw,1.4rem)}
+.clock strong{font-size:1.5em;margin-left:.45rem}
+.top{display:grid;grid-template-columns:1.35fr .95fr;gap:clamp(8px,1vw,16px);margin-bottom:clamp(8px,1vw,16px)}
+.card{border-radius:clamp(10px,1.1vw,18px);background:var(--card);box-shadow:0 8px 24px #071a3030;overflow:hidden;min-width:0}
+.weather{background:linear-gradient(135deg,#1769c2,#54a8e8);color:white;padding:clamp(12px,1.4vw,24px);display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(8px,1vw,16px);align-items:center}
+.location{font-size:clamp(1rem,1.5vw,1.5rem);font-weight:750}
+.current{display:flex;align-items:center;gap:1rem;margin:.6rem 0}
+.weather-icon{font-size:clamp(3rem,5vw,5.5rem);line-height:1}
+.temp{font-size:clamp(2.7rem,5vw,5rem);font-weight:800;line-height:1}
+.temp small{font-size:.38em}
+.weather-desc{font-size:clamp(1rem,1.6vw,1.5rem);font-weight:700}
+.hilo{margin-top:.6rem;opacity:.92;font-size:clamp(.85rem,1.15vw,1.1rem)}
+.forecast{display:grid;grid-template-columns:1fr 1fr;border-left:1px solid #ffffff65}
+.forecast-day{text-align:center;padding:.4rem .6rem}
+.forecast-day+ .forecast-day{border-left:1px solid #ffffff65}
+.forecast-label{font-weight:750;font-size:clamp(.9rem,1.25vw,1.2rem)}
+.forecast-icon{font-size:clamp(2rem,3.5vw,3.6rem);margin:.5rem 0}
+.forecast-temp{font-size:clamp(.95rem,1.3vw,1.3rem);font-weight:750}
+.small-note{font-size:.78rem;opacity:.8;margin-top:.55rem}
+.card-title{display:flex;align-items:center;gap:.65rem;font-size:clamp(1rem,1.45vw,1.5rem);font-weight:800;padding:clamp(9px,1vw,16px) clamp(10px,1.1vw,18px);border-bottom:1px solid var(--line)}
+.card-title .ico{width:2.25rem;height:2.25rem;border-radius:10px;display:grid;place-items:center;background:var(--blue);color:white;font-size:1.25rem;flex-shrink:0}
+.card-title .right{margin-left:auto;font-size:.72em;font-weight:700;color:var(--blue);white-space:nowrap}
+.garbage-body{padding:1rem 1.15rem}
+.area{font-size:.85rem;color:var(--muted);margin-bottom:.7rem}
+.garbage-grid{display:grid;grid-template-columns:1fr 1fr;background:#f5f8fb;border-radius:14px;padding:.75rem}
+.gday{text-align:center;padding:.25rem .5rem}
+.gday+.gday{border-left:1px solid var(--line)}
+.gday-label{font-weight:800;color:var(--green);font-size:clamp(.9rem,1.2vw,1.15rem)}
+.gdate{color:#4e6074;margin:.35rem 0 .7rem}
+.pill{border-radius:999px;background:#e8edf3;padding:.55rem .45rem;font-weight:800;color:#526174;font-size:clamp(.8rem,1.1vw,1.05rem)}
+.pill.fire{background:var(--rose);color:var(--red)}
+.notice{color:var(--muted);font-size:.78rem;line-height:1.5;margin-top:.7rem}
+.main{display:grid;grid-template-columns:1fr 1fr .92fr;gap:clamp(8px,1vw,16px)}
+.train-body{padding:1rem 1.15rem}
+.route{font-weight:800;font-size:clamp(1rem,1.35vw,1.3rem);margin:.2rem 0 .7rem}
+.status{display:inline-block;background:#e7f7ee;color:var(--green);padding:.45rem .8rem;border-radius:9px;font-size:.9rem;font-weight:800;float:right}
+.linkrow{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:1rem 0;font-weight:700;gap:.5rem}
+.linkrow a{color:var(--blue);text-decoration:none}
+.statusbox{background:#f2f6fa;padding:.8rem;border-radius:10px;color:#4e647c;margin-top:.5rem}
+.agenda{padding:1rem 1.15rem}
+.agenda-date{font-weight:800;font-size:1.1rem;margin:.2rem 0 .7rem}
+.event{display:grid;grid-template-columns:12px 3.7rem 1fr;align-items:start;gap:.6rem;padding:.55rem 0;font-size:clamp(.85rem,1.1vw,1.05rem)}
+.dot{width:12px;height:12px;border-radius:50%;margin-top:.35rem;background:#ed6c9a}
+.event:nth-of-type(2) .dot{background:#46a9ed}
+.event:nth-of-type(3) .dot{background:#25a394}
+.agenda-divider{border-top:1px solid var(--line);margin:.8rem 0}
+.side{display:flex;flex-direction:column;gap:clamp(8px,1vw,16px);min-width:0}
+.list-card{background:linear-gradient(135deg,#f7fffc,#e3f7f1)}
+.list-card.shopping{background:linear-gradient(135deg,#f7fffc,#d9f5eb)}
+.list-body{padding:.15rem 1rem .8rem}
+.list-item{display:flex;align-items:center;gap:.65rem;padding:.35rem 0;font-size:clamp(.88rem,1.08vw,1.03rem);cursor:pointer}
+.list-item input{width:1.25rem;height:1.25rem;accent-color:var(--green);flex-shrink:0}
+.list-item.done span{text-decoration:line-through;color:#82958f}
+.addrow{display:flex;gap:.4rem;margin-top:.5rem}
+.addrow input{min-width:0;width:100%;border:1px solid #c9ddd7;border-radius:8px;padding:.55rem;font:inherit;background:#fff}
+.addrow button{border:0;border-radius:8px;padding:.5rem .8rem;background:var(--green);color:white;font-weight:800}
+footer{margin-top:clamp(8px,1vw,16px);background:#0c1d33e8;color:#dce9f8;border-radius:14px;padding:clamp(7px,.8vw,13px) 1rem;display:flex;align-items:center;gap:.7rem;font-size:clamp(.8rem,1.05vw,1.1rem)}
+footer .remote{font-size:1.6rem}
+footer .hint{margin-left:auto;border:1px solid #b4c9df;border-radius:999px;padding:.3rem .8rem;white-space:nowrap}
+
+/* TV landscape mode: keep the complete dashboard within a 16:9 screen. */
+@media (min-width:1100px) and (min-height:650px){
+  body{height:100vh;overflow:hidden}
+  .page{height:100%;display:flex;flex-direction:column}
+  header{flex:0 0 auto}
+  .top{grid-template-columns:1.35fr .95fr;flex:0 0 31%;min-height:0}
+  .main{flex:1 1 auto;min-height:0}
+  .top>.card,.main>.card,.side>.card{min-height:0}
+  .weather{padding:clamp(12px,1.25vw,22px)}
+  .garbage-body,.train-body,.agenda{padding:clamp(9px,1vw,16px)}
+  .card-title{padding:clamp(8px,.8vw,14px) clamp(10px,1vw,17px)}
+  .side .list-card{flex:1 1 0}
+  .list-body{padding:0 clamp(9px,.9vw,15px) clamp(4px,.5vw,8px)}
+  .list-item{padding:clamp(2px,.28vw,5px) 0;font-size:clamp(13px,1.02vw,19px)}
+  .addrow{display:none!important}
+  .agenda .event{padding:clamp(3px,.35vw,6px) 0}
+  .notice{font-size:clamp(11px,.78vw,14px)}
+  footer{flex:0 0 auto}
+}
+
+@media(max-width:900px){
+ body{padding:.65rem}.top{grid-template-columns:1fr}.main{grid-template-columns:1fr 1fr}.side{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+ header{align-items:flex-start;flex-direction:column}.clock{text-align:left}.weather{grid-template-columns:1fr}.forecast{border-left:0;border-top:1px solid #ffffff65;padding-top:.6rem}
+ .main,.side{grid-template-columns:1fr}.side{grid-column:auto}.tagline{display:none}
+}
+
+/* TV-first layout: larger text, fewer decorative labels, and all panels visible */
+@media (min-width: 1000px) {
+  body { padding: 10px 14px; background: linear-gradient(145deg,#183454,#365b7c 55%,#243b55); }
+  .page { max-width: 1900px; height: calc(100vh - 20px); display:flex; flex-direction:column; gap:10px; }
+  header { padding: 0 8px 2px; }
+  .brand { font-size: clamp(22px,2vw,34px); }
+  .tagline { display:none; }
+  .clock { font-size: clamp(16px,1.35vw,22px); }
+  .clock strong { font-size:1.2em; }
+  .top { flex: 0 0 38%; min-height:0; grid-template-columns:1.12fr 1fr; gap:10px; margin:0; }
+  .main { flex:1 1 0; min-height:0; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  .card { border-radius:12px; }
+  .weather { padding:14px; grid-template-columns:.8fr 1.2fr; gap:10px; }
+  .location { font-size:clamp(17px,1.45vw,23px); }
+  .weather-icon { font-size:clamp(42px,4vw,60px); }
+  .temp { font-size:clamp(42px,4.2vw,64px); }
+  .weather-desc { font-size:clamp(17px,1.4vw,22px); }
+  .hilo,.forecast-temp { font-size:clamp(15px,1.15vw,19px); }
+  .forecast-label { font-size:clamp(15px,1.2vw,20px); }
+  .forecast-icon { font-size:clamp(34px,3vw,48px); margin:5px 0; }
+  .small-note { font-size:clamp(12px,.9vw,15px); }
+  #weatherNote { display:none; }
+  .card-title { font-size:clamp(18px,1.4vw,23px); padding:10px 12px; gap:8px; }
+  .card-title .ico { width:30px;height:30px;font-size:18px;border-radius:7px; }
+  .card-title .right { font-size:12px; }
+  .garbage-body,.train-body,.agenda { padding:10px 12px; }
+  .area { font-size:14px; margin-bottom:8px; }
+  .garbage-grid { padding:8px; }
+  .gday-label { font-size:17px; }
+  .gdate { font-size:15px; margin:4px 0 8px; }
+  .pill { font-size:clamp(15px,1.1vw,19px); padding:8px 4px; }
+  #nextGarbage { font-size:clamp(14px,1.08vw,18px); line-height:1.5!important; }
+  .notice { font-size:12px; line-height:1.35; margin-top:8px; }
+  .route { font-size:clamp(17px,1.25vw,21px); }
+  .status { float:none; font-size:14px; margin:3px 0 6px; }
+  .linkrow { padding:8px 0; font-size:14px; }
+  .statusbox { font-size:14px; padding:8px; line-height:1.4; }
+  .agenda-date { font-size:18px; margin:2px 0 5px; }
+  .event { grid-template-columns:10px 3rem 1fr; gap:7px; font-size:15px; padding:7px 0; }
+  .dot { width:10px;height:10px; }
+  .agenda .notice { font-size:12px; }
+  .side { gap:10px; }
+  .side .list-card { flex:1 1 0; }
+  .list-body { padding:0 12px 8px; }
+  .list-item { font-size:clamp(15px,1.1vw,19px); padding:6px 0; gap:8px; }
+  .list-item input { width:20px;height:20px; }
+  .addrow { display:none!important; }
+  footer { display:none; }
+}
+
+
+/* Reference-inspired TV dashboard: polished 16:9 grid with large readable cards */
+@media (min-width: 1000px) {
+  body { padding: 12px; background: radial-gradient(ellipse at 50% 0%, #527da2 0%, #1b3554 55%, #07162b 100%); }
+  .page { width:100%; max-width:none; height:calc(100vh - 24px); gap:12px; }
+  header { min-height:58px; padding:0 12px 2px; }
+  .brand { font-size:clamp(26px,2.15vw,38px); }
+  .brand .house { font-size:1.25em; }
+  .clock { font-size:clamp(17px,1.35vw,24px); }
+  .top { flex:0 0 34%; grid-template-columns:1.35fr .95fr; gap:12px; }
+  .main { grid-template-columns:1fr 1fr .92fr; gap:12px; }
+  .card { border-radius:16px; box-shadow:0 8px 24px #06152c55; }
+  .weather { padding:clamp(14px,1.4vw,24px); grid-template-columns:.85fr 1.15fr; }
+  .location { font-size:clamp(20px,1.55vw,28px); }
+  .current { gap:12px; margin:12px 0; }
+  .weather-icon { font-size:clamp(48px,4.5vw,76px); }
+  .temp { font-size:clamp(48px,4.8vw,82px); }
+  .weather-desc { font-size:clamp(19px,1.5vw,27px); }
+  .hilo,.forecast-temp { font-size:clamp(16px,1.25vw,22px); }
+  .forecast-label { font-size:clamp(17px,1.3vw,23px); }
+  .forecast-icon { font-size:clamp(40px,3.6vw,62px); margin:10px 0; }
+  .small-note { font-size:clamp(13px,.95vw,17px); }
+  .card-title { font-size:clamp(21px,1.55vw,28px); padding:clamp(12px,1.05vw,19px) clamp(14px,1.2vw,22px); gap:10px; }
+  .card-title .ico { width:clamp(34px,2.4vw,44px); height:clamp(34px,2.4vw,44px); font-size:clamp(20px,1.4vw,25px); border-radius:10px; }
+  .card-title .right { font-size:clamp(13px,.9vw,16px); }
+  .garbage-body,.train-body,.agenda { padding:clamp(13px,1.1vw,20px); }
+  .area { font-size:clamp(13px,.95vw,17px); margin-bottom:12px; }
+  .garbage-grid { padding:12px; }
+  .gday-label { font-size:clamp(17px,1.25vw,22px); }
+  .gdate { font-size:clamp(16px,1.1vw,20px); margin:7px 0 12px; }
+  .pill { font-size:clamp(16px,1.25vw,22px); padding:clamp(9px,.8vw,14px) 6px; }
+  #nextGarbage { font-size:clamp(15px,1.18vw,21px); line-height:1.55!important; }
+  .notice { font-size:clamp(12px,.86vw,16px); line-height:1.45; margin-top:10px; }
+  .route { font-size:clamp(19px,1.45vw,26px); margin:.25rem 0 .7rem; }
+  .status { float:none; font-size:clamp(14px,1vw,18px); margin:4px 0 8px; }
+  .linkrow { padding:clamp(10px,.8vw,15px) 0; font-size:clamp(15px,1.05vw,19px); }
+  .statusbox { font-size:clamp(15px,1.05vw,19px); padding:clamp(10px,.85vw,16px); line-height:1.5; }
+  .agenda-date { font-size:clamp(20px,1.4vw,25px); margin:3px 0 8px; }
+  .event { grid-template-columns:12px 3.7rem 1fr; gap:9px; font-size:clamp(16px,1.15vw,21px); padding:clamp(7px,.65vw,12px) 0; }
+  .dot { width:12px;height:12px; }
+  .agenda-divider { margin:12px 0; }
+  .side { gap:12px; }
+  .side .list-card { flex:1 1 0; }
+  .list-body { padding:0 clamp(12px,1vw,18px) 10px; }
+  .list-item { font-size:clamp(16px,1.15vw,21px); padding:clamp(5px,.5vw,9px) 0; gap:10px; }
+  .list-item input { width:clamp(20px,1.4vw,26px); height:clamp(20px,1.4vw,26px); }
+  .addrow { display:none!important; }
+  footer { display:none; }
+}
+
+
+
+/* Fire TV / television browser override: many TV browsers report a CSS viewport
+   narrower than 1000px. Treat a landscape viewport as TV mode and fit all panels. */
+@media (orientation: landscape) and (min-width: 700px) and (min-height: 380px) {
+  html, body { width:100%; height:100%; min-height:0; overflow:hidden; }
+  body { padding:8px 12px; }
+  .page {
+    width:100%; max-width:none; height:calc(100vh - 16px);
+    min-height:0; display:grid; grid-template-rows: 42px minmax(0, 0.88fr) minmax(0, 1.12fr);
+    gap:8px;
+  }
+  header { min-height:0; padding:0 6px 2px; gap:8px; }
+  .brand { font-size:clamp(18px, 2.3vw, 30px); gap:8px; }
+  .brand .house { font-size:1.1em; }
+  .tagline { display:none; }
+  .clock { font-size:clamp(12px, 1.45vw, 18px); }
+  .clock strong { font-size:1.15em; }
+  .top { min-height:0; height:auto; margin:0; grid-template-columns:1.2fr 1fr; gap:8px; }
+  .main { min-height:0; height:auto; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .card, .side>.card, .top>.card, .main>.card { min-height:0; min-width:0; }
+  .weather { padding:clamp(8px, 1vw, 14px); grid-template-columns:.82fr 1.18fr; gap:6px; }
+  .location { font-size:clamp(13px, 1.55vw, 20px); }
+  .current { gap:7px; margin:6px 0; }
+  .weather-icon { font-size:clamp(30px, 3.8vw, 48px); }
+  .temp { font-size:clamp(32px, 4vw, 54px); }
+  .weather-desc { font-size:clamp(13px, 1.5vw, 19px); }
+  .hilo, .forecast-temp { font-size:clamp(11px, 1.1vw, 15px); }
+  .forecast-label { font-size:clamp(12px, 1.2vw, 16px); }
+  .forecast-icon { font-size:clamp(25px, 2.8vw, 38px); margin:4px 0; }
+  .small-note { font-size:clamp(10px, .85vw, 12px); }
+  .card-title { font-size:clamp(14px, 1.4vw, 19px); padding:7px 9px; gap:6px; }
+  .card-title .ico { width:26px; height:26px; font-size:15px; border-radius:6px; }
+  .card-title .right { font-size:clamp(9px, .8vw, 11px); }
+  .garbage-body, .train-body, .agenda { padding:clamp(7px, .85vw, 11px); }
+  .area { font-size:clamp(10px, .9vw, 12px); margin-bottom:5px; }
+  .garbage-grid { padding:5px; }
+  .gday { padding:2px; }
+  .gday-label { font-size:clamp(11px, 1vw, 14px); }
+  .gdate { font-size:clamp(10px, .95vw, 13px); margin:3px 0 5px; }
+  .pill { font-size:clamp(10px, 1vw, 14px); padding:6px 3px; }
+  #nextGarbage { font-size:clamp(11px, 1.05vw, 14px); line-height:1.3 !important; overflow-wrap:anywhere; }
+  .notice { font-size:clamp(9px, .78vw, 11px); line-height:1.25; margin-top:5px; }
+  .route { font-size:clamp(13px, 1.2vw, 17px); margin:2px 0 5px; }
+  .status { float:none; font-size:clamp(10px, .9vw, 12px); margin:2px 0 4px; padding:4px 6px; }
+  .linkrow { padding:5px 0; font-size:clamp(10px, .95vw, 13px); }
+  .statusbox { font-size:clamp(10px, .95vw, 13px); padding:6px; line-height:1.25; }
+  .agenda-date { font-size:clamp(13px, 1.1vw, 16px); margin:2px 0 4px; }
+  .event { grid-template-columns:8px 2.7rem minmax(0,1fr); gap:5px; font-size:clamp(10px, .95vw, 13px); padding:4px 0; }
+  .dot { width:8px; height:8px; }
+  .agenda-divider { margin:5px 0; }
+  .side { min-height:0; display:flex; flex-direction:column; gap:8px; }
+  .side .list-card { flex:1 1 0; min-height:0; }
+  .list-body { padding:0 8px 5px; }
+  .list-item { font-size:clamp(10px, .95vw, 13px); padding:3px 0; gap:5px; }
+  .list-item input { width:15px; height:15px; }
+  .addrow, footer { display:none !important; }
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="brand"><span class="house">⌂</span><span>家族の情報ボード</span><span class="tagline">今日もいい一日を 🌿</span></div>
+  <div class="clock"><span id="date">日付を読み込み中</span><strong id="time">--:--</strong></div>
+</header>
+<section class="top">
+  <article class="card weather">
+    <div>
+      <div class="location">☀️ 東広島市 <span style="font-size:.8em">📍</span></div>
+      <div class="current"><span class="weather-icon" id="weatherIcon">🌤️</span><div><div class="temp"><span id="currentTemp">--</span><small>°C</small></div><div class="weather-desc" id="weatherDesc">天気を取得しています</div></div></div>
+      <div class="hilo">最高 <b id="todayMax">--</b>°C　 最低 <b id="todayMin">--</b>°C</div>
+    </div>
+    <div class="forecast">
+      <div class="forecast-day"><div class="forecast-label">今日 <span id="todayLabel"></span></div><div class="forecast-icon" id="todayIcon">🌤️</div><div class="forecast-temp"><span id="todayHi">--</span>° / <span id="todayLo">--</span>°C</div><div class="small-note">降水確率 <span id="todayRain">--</span>%</div></div>
+      <div class="forecast-day"><div class="forecast-label">明日 <span id="tomorrowLabel"></span></div><div class="forecast-icon" id="tomorrowIcon">☀️</div><div class="forecast-temp"><span id="tomorrowHi">--</span>° / <span id="tomorrowLo">--</span>°C</div><div class="small-note">降水確率 <span id="tomorrowRain">--</span>%</div></div>
+    </div>
+    <div class="small-note" id="weatherNote" style="grid-column:1/-1">無料の気象データを読み込み中…</div>
+  </article>
+  <article class="card">
+    <div class="card-title"><span class="ico" style="background:#f4f7fa;color:#1a5265">▤</span>ごみの日 <span class="right">📍 東広島市 八本松南</span></div>
+    <div class="garbage-body">
+      <div class="area">八本松南4〜8丁目・令和8年度公式カレンダー</div>
+      <div class="garbage-grid">
+        <div class="gday"><div class="gday-label">今日</div><div class="gdate" id="garbageTodayDate">--/--</div><div class="pill" id="garbageToday">収集なし</div></div>
+        <div class="gday"><div class="gday-label">明日</div><div class="gdate" id="garbageTomorrowDate">--/--</div><div class="pill fire" id="garbageTomorrow">収集なし</div></div>
+      </div>
+      <div id="nextGarbage" style="margin-top:.75rem;font-weight:800;line-height:1.7">次の収集日を確認中…</div>
+      <div class="notice">朝7時30分までに出してください。空欄・休の日は収集なし。<br><a href="https://www.city.higashihiroshima.lg.jp/material/files/group/18/C_hatihonmatuminami.pdf" target="_blank" rel="noreferrer">東広島市公式カレンダー（八本松南4〜8丁目）↗</a></div>
+    </div>
+  </article>
+</section>
+<section class="main">
+  <article class="card">
+    <div class="card-title"><span class="ico">▣</span>電車の運行状況 <span class="right"><a href="https://trafficinfo.westjr.co.jp/chugoku.html" target="_blank" rel="noreferrer">JR西日本 ↗</a></span></div>
+    <div class="train-body">
+      <div class="route">山陽本線（広島〜岡山方面）</div>
+      <div class="status">公式情報を確認</div>
+      <div style="clear:both"></div>
+      <div class="linkrow"><span>JR西日本 中国エリア運行情報</span><a href="https://trafficinfo.westjr.co.jp/chugoku.html" target="_blank" rel="noreferrer">開く ›</a></div>
+      <div style="font-weight:750;margin-top:.6rem">遅延・運休情報</div>
+      <div class="statusbox">この試作版では運行状態を自動判定しません。最新情報は公式ページで確認してください。</div>
+    </div>
+  </article>
+  <article class="card">
+    <div class="card-title"><span class="ico">▦</span>今日・明日の予定 <span class="right"><a href="https://timetreeapp.com/" target="_blank" rel="noreferrer">TimeTreeで見る ↗</a></span></div>
+    <div class="agenda">
+      <div class="agenda-date" id="agendaToday">今日</div>
+      <div class="event"><span class="dot"></span><span>予定</span><span>TimeTreeを開いて確認</span></div>
+      <div class="agenda-divider"></div>
+      <div class="agenda-date" id="agendaTomorrow">明日</div>
+      <div class="event"><span class="dot"></span><span>予定</span><span>TimeTreeを開いて確認</span></div>
+      <div class="notice">TimeTreeの予定は自動連携していません。右上のリンクから開けます。</div>
+    </div>
+  </article>
+  <div class="side">
+    <article class="card list-card">
+      <div class="card-title" style="border:0;padding-bottom:.45rem"><span class="ico" style="background:#147d70">✓</span>やることリスト</div>
+      <div class="list-body" id="tasks">
+        <label class="list-item"><input type="checkbox"><span>保育園の準備（連絡帳・持ち物）</span></label>
+        <label class="list-item"><input type="checkbox"><span>書類を提出する</span></label>
+        <label class="list-item"><input type="checkbox"><span>ガソリンを入れる</span></label>
+      </div>
+      <div class="addrow" style="padding:0 1rem 1rem"><input id="taskInput" placeholder="やることを追加"><button id="addTask">追加</button></div>
+    </article>
+    <article class="card list-card shopping">
+      <div class="card-title" style="border:0;padding-bottom:.45rem"><span class="ico" style="background:#147d70">🛒</span>買い物リスト</div>
+      <div class="list-body" id="shopping">
+        <label class="list-item"><input type="checkbox"><span>牛乳</span></label>
+        <label class="list-item"><input type="checkbox"><span>たまご</span></label>
+        <label class="list-item"><input type="checkbox"><span>食パン</span></label>
+        <label class="list-item"><input type="checkbox"><span>洗剤</span></label>
+        <label class="list-item"><input type="checkbox"><span>野菜（にんじん・玉ねぎ）</span></label>
+      </div>
+      <div class="addrow" style="padding:0 1rem 1rem"><input id="shoppingInput" placeholder="買うものを追加"><button id="addShopping">追加</button></div>
+    </article>
+  </div>
+</section>
+<footer><span class="remote">▯</span><span>家族みんなで使う情報ボード</span><span class="hint">DAZNボタンの変更は後で確認</span></footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function updateClock(){
+ const now=new Date();
+ $('date').textContent=new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(now);
+ $('time').textContent=new Intl.DateTimeFormat('ja-JP',{hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
+ const tomorrow=new Date(now);tomorrow.setDate(now.getDate()+1);
+ const fmt=d=>`${d.getMonth()+1}/${d.getDate()} (${['日','月','火','水','木','金','土'][d.getDay()]})`;
+ $('todayLabel').textContent=`(${fmt(now)})`; $('tomorrowLabel').textContent=`(${fmt(tomorrow)})`;
+ $('garbageTodayDate').textContent=fmt(now);$('garbageTomorrowDate').textContent=fmt(tomorrow);
+ $('agendaToday').textContent=fmt(now);$('agendaTomorrow').textContent=fmt(tomorrow);
+}
+updateClock();setInterval(updateClock,30000);
+
+// 東広島市公式「八本松南4〜8丁目」令和8年度カレンダーから、直近の収集日を登録
+// 収集日・区分は公式PDFを参照。年度途中の臨時変更は公式リンクで確認してください。
+const garbageSchedule = {
+ '2026-10-13':'リサイクルプラ','2026-10-14':'可燃','2026-10-16':'ビン・缶','2026-10-17':'可燃',
+ '2026-10-20':'リサイクルプラ','2026-10-21':'可燃','2026-10-22':'雑誌・ダンボール','2026-10-23':'ペットボトル','2026-10-24':'可燃',
+ '2026-10-27':'リサイクルプラ','2026-10-28':'可燃','2026-10-29':'有害','2026-10-30':'ビン・缶','2026-10-31':'可燃',
+ '2026-11-04':'可燃','2026-11-05':'その他プラ','2026-11-06':'ペットボトル','2026-11-07':'可燃',
+ '2026-11-10':'リサイクルプラ','2026-11-11':'可燃','2026-11-12':'新聞','2026-11-13':'ビン・缶','2026-11-14':'可燃',
+ '2026-11-17':'リサイクルプラ','2026-11-18':'可燃','2026-11-19':'雑誌・ダンボール','2026-11-20':'ペットボトル','2026-11-21':'可燃',
+ '2026-11-24':'リサイクルプラ','2026-11-25':'可燃','2026-11-27':'ビン・缶','2026-11-28':'可燃','2026-11-30':'可燃'
+};
+function dateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function updateGarbage(){
+ const now=new Date(); now.setHours(0,0,0,0); const tomorrow=new Date(now);tomorrow.setDate(tomorrow.getDate()+1);
+ const fmt=d=>`${d.getMonth()+1}/${d.getDate()} (${['日','月','火','水','木','金','土'][d.getDay()]})`;
+ const todayName=garbageSchedule[dateKey(now)]||'収集なし';
+ const tomorrowName=garbageSchedule[dateKey(tomorrow)]||'収集なし';
+ $('garbageToday').textContent=todayName; $('garbageTomorrow').textContent=tomorrowName;
+ $('garbageTodayDate').textContent=fmt(now); $('garbageTomorrowDate').textContent=fmt(tomorrow);
+ const upcoming=[]; for(let i=0;i<60;i++){const d=new Date(now);d.setDate(now.getDate()+i);const name=garbageSchedule[dateKey(d)];if(name)upcoming.push({d,name});if(upcoming.length===3)break;}
+ $('nextGarbage').innerHTML=upcoming.length ? '次の収集：'+upcoming.map(x=>`${fmt(x.d)} <span style="color:#1769c2">${x.name}</span>`).join('　／　') : '先の収集日は公式カレンダーで確認してください。';
+}
+updateGarbage();
+
+// Open-Meteoの無料予報データを利用（東広島市・八本松周辺）
+function weatherInfo(code){
+ if(code===0)return ['☀️','快晴'];
+ if([1,2].includes(code))return ['🌤️','晴れ時々くもり'];
+ if(code===3)return ['☁️','くもり'];
+ if([45,48].includes(code))return ['🌫️','霧'];
+ if([51,53,55,56,57].includes(code))return ['🌦️','霧雨'];
+ if([61,63,65,66,67,80,81,82].includes(code))return ['🌧️','雨'];
+ if([71,73,75,77,85,86].includes(code))return ['❄️','雪'];
+ if([95,96,99].includes(code))return ['⛈️','雷雨'];
+ return ['🌥️','天気'];
+}
+async function loadWeather(){
+ const note=$('weatherNote');
+ try{
+  const url='https://api.open-meteo.com/v1/forecast?latitude=34.47&longitude=132.69&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=2';
+  const response=await fetch(url,{cache:'no-store'});
+  if(!response.ok)throw new Error('weather fetch failed');
+  const data=await response.json();
+  const current=data.current, daily=data.daily;
+  const [currentIcon,currentText]=weatherInfo(current.weather_code);
+  $('weatherIcon').textContent=currentIcon;
+  $('currentTemp').textContent=Math.round(current.temperature_2m);
+  $('weatherDesc').textContent=currentText;
+  $('todayMax').textContent=Math.round(daily.temperature_2m_max[0]);
+  $('todayMin').textContent=Math.round(daily.temperature_2m_min[0]);
+  for(let i=0;i<2;i++){
+   const [icon]=weatherInfo(daily.weather_code[i]);
+   const prefix=i===0?'today':'tomorrow';
+   $(prefix+'Icon').textContent=icon;
+   $(prefix+'Hi').textContent=Math.round(daily.temperature_2m_max[i]);
+   $(prefix+'Lo').textContent=Math.round(daily.temperature_2m_min[i]);
+   $(prefix+'Rain').textContent=daily.precipitation_probability_max[i] ?? '--';
+  }
+  note.textContent='気象データ：Open-Meteo（自動更新）';
+ }catch(e){
+  note.textContent='天気を取得できません。ネット接続を確認して再読み込みしてください。';
+  $('weatherDesc').textContent='取得できません';
+ }
+}
+loadWeather();
+setInterval(loadWeather,30*60*1000);
+function addItem(inputId,listId){
+ const input=$(inputId),text=input.value.trim();if(!text)return;
+ const label=document.createElement('label');label.className='list-item';
+ const cb=document.createElement('input');cb.type='checkbox';
+ const span=document.createElement('span');span.textContent=text;
+ cb.addEventListener('change',()=>label.classList.toggle('done',cb.checked));
+ label.append(cb,span);$(listId).append(label);input.value='';
+}
+$('addTask').addEventListener('click',()=>addItem('taskInput','tasks'));
+$('addShopping').addEventListener('click',()=>addItem('shoppingInput','shopping'));
+$('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter')addItem('taskInput','tasks')});
+$('shoppingInput').addEventListener('keydown',e=>{if(e.key==='Enter')addItem('shoppingInput','shopping')});
+document.querySelectorAll('.list-item input').forEach(cb=>cb.addEventListener('change',()=>cb.parentElement.classList.toggle('done',cb.checked)));
+</script>
+</body>
+</html>
